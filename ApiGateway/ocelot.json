@@ -1,0 +1,94 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/trip",
+      "UpstreamPathTemplate": "/trip",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/trip/{tripId}",
+      "UpstreamPathTemplate": "/trip/{tripId}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/trip/update-seats/{tripId}/{seats}",
+      "UpstreamPathTemplate": "/trip/update-seats/{tripId}/{seats}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/trip/restore-seats/{tripId}/{seats}",
+      "UpstreamPathTemplate": "/trip/restore-seats/{tripId}/{seats}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
+      ]
+    },
+
+
+    {
+      "DownstreamPathTemplate": "/api/booking",
+      "UpstreamPathTemplate": "/booking",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking",
+      "UpstreamPathTemplate": "/booking",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/cancel/{bookingId}",
+      "UpstreamPathTemplate": "/booking/cancel/{bookingId}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ]
+    }
+  ],
+
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5003"
+  }
+}
