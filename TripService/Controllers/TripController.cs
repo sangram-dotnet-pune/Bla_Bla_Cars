@@ -16,19 +16,14 @@ namespace TripService.Controllers
         }
 
         [HttpGet("{tripId:guid}")]
-        public async Task<ActionResult<TripDto>> GetTripById(Guid tripId)
+        public async Task<ActionResult<Trip>> GetTripById(Guid tripId)
         {
             var trip = await _context.Trips.FirstOrDefaultAsync(x => x.TripId == tripId);
 
             if (trip == null)
                 return NotFound();
 
-            return Ok(new TripDto
-            {
-                TripId = tripId,
-                AvailableSeats = trip.AvailableSeats,
-                PricePerSeat = trip.PricePerSeat
-            });
+            return Ok(trip);
         }
 
 

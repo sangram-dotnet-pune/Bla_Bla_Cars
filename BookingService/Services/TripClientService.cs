@@ -15,7 +15,7 @@ namespace BookingService.Services
                 _http = http;
             }
 
-            public async Task<TripDto?> GetTripByIdAsync(Guid tripId)
+            public async Task<Trip?> GetTripByIdAsync(Guid tripId)
             {
             //try
             //{
@@ -25,7 +25,7 @@ namespace BookingService.Services
             //{
             //    return null; // Trip Service unavailable
             //}
-            return await _http.GetFromJsonAsync<TripDto>($"api/trip/{tripId}");
+            return await _http.GetFromJsonAsync<Trip>($"api/trip/{tripId}");
         }
 
         public async Task<bool> UpdateSeatsAsync(Guid tripId, int seats)

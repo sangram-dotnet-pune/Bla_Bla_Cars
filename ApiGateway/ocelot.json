@@ -2,7 +2,7 @@
   "Routes": [
     {
       "DownstreamPathTemplate": "/api/trip",
-      "UpstreamPathTemplate": "/trip",
+      "UpstreamPathTemplate": "/api/trip",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -13,8 +13,8 @@
       ]
     },
     {
-      "DownstreamPathTemplate": "/api/trip/{tripId}",
-      "UpstreamPathTemplate": "/trip/{tripId}",
+      "DownstreamPathTemplate": "/api/Trip/{tripId}",
+      "UpstreamPathTemplate": "/api/Trip/{tripId}",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -26,7 +26,7 @@
     },
     {
       "DownstreamPathTemplate": "/api/trip/update-seats/{tripId}/{seats}",
-      "UpstreamPathTemplate": "/trip/update-seats/{tripId}/{seats}",
+      "UpstreamPathTemplate": "/api/trip/update-seats/{tripId}/{seats}",
       "UpstreamHttpMethod": [ "PUT" ],
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -38,7 +38,7 @@
     },
     {
       "DownstreamPathTemplate": "/api/trip/restore-seats/{tripId}/{seats}",
-      "UpstreamPathTemplate": "/trip/restore-seats/{tripId}/{seats}",
+      "UpstreamPathTemplate": "/api/trip/restore-seats/{tripId}/{seats}",
       "UpstreamHttpMethod": [ "PUT" ],
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [

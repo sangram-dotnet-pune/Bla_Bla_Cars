@@ -33,7 +33,7 @@ namespace BookingService.Controllers
                 {
                     BookingId = b.BookingId,
                     TripId = b.TripId,
-                  
+                  PassengerName = b.PassengerName,
                     SeatsBooked = b.SeatsBooked,
                     Status=b.Status.ToString(),
                      TotalAmount = b.TotalAmount
