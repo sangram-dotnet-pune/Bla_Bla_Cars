@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TripService.Models;
@@ -10,11 +11,12 @@ namespace TripService.Controllers
     public class TripController(TripDbContext _context) : ControllerBase
     {
         [HttpGet]
+      
         public async Task<ActionResult<List<Trip>>> getAllTrips()
         {
             return await _context.Trips.AsNoTracking().ToListAsync();
         }
-
+      
         [HttpGet("{tripId:guid}")]
         public async Task<ActionResult<Trip>> GetTripById(Guid tripId)
         {
@@ -30,6 +32,7 @@ namespace TripService.Controllers
 
 
         [HttpPost]
+       
         public async Task<ActionResult<Trip>> CreateTrip([FromBody] Trip trip)
         {
             if (trip == null || !ModelState.IsValid)

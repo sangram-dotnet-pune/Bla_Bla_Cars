@@ -4,6 +4,7 @@ using BookingService.Models;
 using Microsoft.AspNetCore.Mvc;
 using TripService.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookingService.Controllers
 {
@@ -24,7 +25,7 @@ namespace BookingService.Controllers
         }
 
         [HttpGet]
-
+       
         public async Task<ActionResult<List<BookingResponse>>> GetAllBookings()
         {
             return await _context.Bookings
@@ -41,6 +42,7 @@ namespace BookingService.Controllers
                 .ToListAsync();
         }
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> CreateBooking([FromBody] CreateBookingRequest booking)
         {
             var trip = await _tripClient.GetTripByIdAsync(booking.TripId);
@@ -78,6 +80,7 @@ namespace BookingService.Controllers
         }
 
         [HttpPut("cancel/{bookingId:guid}")]
+        [Authorize]
         public async Task<ActionResult> CancelBooking(Guid bookingId)
         {
             var booking = await _context.Bookings.FirstOrDefaultAsync(b => b.BookingId == bookingId);
