@@ -25,11 +25,13 @@ namespace BookingService.Controllers
         }
 
         [HttpGet]
+        [Authorize]
        
         public async Task<ActionResult<List<BookingResponse>>> GetAllBookings()
         {
             return await _context.Bookings
                 .AsNoTracking()
+                .Where(b=>b.Status!=BookingStatus.Cancelled)
                 .Select(b => new BookingResponse
                 {
                     BookingId = b.BookingId,

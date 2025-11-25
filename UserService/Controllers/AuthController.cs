@@ -58,7 +58,14 @@ namespace UserService.Controllers
 
             var token = GenerateJwtToken(user);
 
-            return Ok(new { token, user.UserId, user.FullName });
+            return Ok(new
+            {
+                token,
+                userId = user.UserId,
+                fullName = user.FullName,
+                email = user.Email,
+                phoneNumber = user.PhoneNumber
+            });
         }
 
         private string GenerateJwtToken(AppUser user)
