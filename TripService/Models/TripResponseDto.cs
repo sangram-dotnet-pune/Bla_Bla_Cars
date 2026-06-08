@@ -1,11 +1,11 @@
-﻿using System.Net.NetworkInformation;
-
-namespace TripService.Models
+﻿namespace TripService.Models
 {
-    public class Trip
+    public class TripResponseDto
     {
         public Guid TripId { get; set; }
-        public Guid DriverId { get; set; } 
+        public Guid DriverId { get; set; }
+
+        public string DriverName { get; set; }
 
         public string StartLocation { get; set; }
         public string EndLocation { get; set; }
@@ -22,6 +22,5 @@ namespace TripService.Models
 
         public List<string> MiddleCities { get; set; } = new();
         public string? Comment { get; set; }
-
     }
 }

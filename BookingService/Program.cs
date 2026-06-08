@@ -12,10 +12,37 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme.",
+        Name = "Authorization",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement{
+    {
+        new Microsoft.OpenApi.Models.OpenApiSecurityScheme{
+            Reference = new Microsoft.OpenApi.Models.OpenApiReference{
+                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                Id = "Bearer"
+            }
+        }, new string[]{}
+    }});
+});
 builder.Services.AddHttpClient<TripClientService>(client =>
 {
     client.BaseAddress = new Uri("http://localhost:5003/"); 
+});
+
+builder.Services.AddHttpClient<UserClientService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5003/");
 });
 
 // JWT Authentication

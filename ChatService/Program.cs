@@ -1,15 +1,13 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using ChatService.Hub;
+using ChatService.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using TripService.Models;
-using TripService.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -34,30 +32,27 @@ builder.Services.AddSwaggerGen(c =>
         }, new string[]{}
     }});
 });
-builder.Services.AddHttpClient<UserClientService>(client =>
-{
-    client.BaseAddress = new Uri("http://localhost:5003/");
-});
-builder.Services.AddDbContext<TripDbContext>(options =>
+builder.Services.AddDbContext<ChatDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
-            )
-        };
-    });
 
-builder.Services.AddAuthorization();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowGatewayAndFrontend", policy =>
+    {
+        policy.WithOrigins(
+                "https://localhost:5001", // gateway
+                "http://localhost:5173",
+                "https://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -68,8 +63,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseAuthentication();
+app.UseHttpsRedirection();
+app.UseCors("AllowGatewayAndFrontend");
+
 app.UseAuthorization();
+
+app.MapHub<ChatHub>("/chatHub");
 
 app.MapControllers();
 

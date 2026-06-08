@@ -2,7 +2,8 @@
 {
     public enum BookingStatus
     {
-        Pending,     // waiting for payment confirmation
+        Pending,
+        Rejected,
         Confirmed,
         Cancelled,
         Failed

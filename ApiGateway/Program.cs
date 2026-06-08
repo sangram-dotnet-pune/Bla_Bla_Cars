@@ -15,23 +15,15 @@ builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange
 
 builder.Services.AddCors(options =>
 {
-    //options.AddPolicy("AllowReact",
-    //     //policy =>
-    //     //{
-    //     //    policy
-    //     //        .WithOrigins("http://localhost:5173") // React Vite URL
-    //     //        .AllowAnyHeader()
-    //     //        .AllowAnyMethod()
-    //     //        .AllowCredentials();
-
-    //     //});
-         options.AddPolicy("AllowAll", policy =>
-         {
-             policy
-                 .AllowAnyOrigin()
-                 .AllowAnyHeader()
-                 .AllowAnyMethod();
-         });
+    
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+  
 });
 
 
@@ -43,10 +35,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("AllowAll");  // ? Enable CORS
+app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 
+app.UseWebSockets();
 app.MapControllers();
 await app.UseOcelot();
 

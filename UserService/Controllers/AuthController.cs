@@ -162,7 +162,34 @@ namespace UserService.Controllers
             return Ok("Password changed successfully");
         }
 
+        public class UserDetailsDto
+        {
+            public Guid UserId { get; set; }
+            public string FullName { get; set; }
+            public string Email { get; set; }
+            public string? PhoneNumber { get; set; }
+        }
 
+        [Authorize]
+        [HttpGet("me/{userId:Guid}")]
+        public async Task<IActionResult> GetCurrentUser(Guid userId)
+        {
+            
+
+            var user = await _context.AppUsers.FirstOrDefaultAsync(u => u.UserId == userId);
+            if (user == null)
+                return NotFound("User not found.");
+
+            var dto = new UserDetailsDto
+            {
+                UserId = user.UserId,
+                FullName = user.FullName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber
+            };
+
+            return Ok(dto);
+        }
 
     }
 }

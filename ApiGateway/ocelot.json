@@ -3,7 +3,19 @@
     {
       "DownstreamPathTemplate": "/api/trip",
       "UpstreamPathTemplate": "/api/trip",
-      "UpstreamHttpMethod": [ "GET","POST" ],
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/trip/my-trips",
+      "UpstreamPathTemplate": "/api/trip/my-trips",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -62,6 +74,19 @@
         }
       ]
     },
+
+    {
+      "DownstreamPathTemplate": "/api/booking/trip/{tripId}",
+      "UpstreamPathTemplate": "/booking/trip/{tripId}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ]
+    },
     {
       "DownstreamPathTemplate": "/api/booking",
       "UpstreamPathTemplate": "/booking",
@@ -77,6 +102,30 @@
     {
       "DownstreamPathTemplate": "/api/booking/cancel/{bookingId}",
       "UpstreamPathTemplate": "/booking/cancel/{bookingId}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/{bookingId}/approve",
+      "UpstreamPathTemplate": "/booking/{bookingId}/approve",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/{bookingId}/reject",
+      "UpstreamPathTemplate": "/booking/{bookingId}/reject",
       "UpstreamHttpMethod": [ "PUT" ],
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -145,6 +194,46 @@
           "Port": 5000
         }
       ]
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/auth/me/{userId}",
+      "UpstreamPathTemplate": "/auth/me/{userId}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/chat/{everything}",
+      "UpstreamPathTemplate": "/chat/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5006
+        }
+      ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+
+    {
+      "UpstreamPathTemplate": "/hubs/chat/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "OPTIONS" ],
+      "DownstreamPathTemplate": "/chatHub/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5006
+        }
+      ],
+      "DangerousAcceptAnyServerCertificateValidator": true
     }
 
 

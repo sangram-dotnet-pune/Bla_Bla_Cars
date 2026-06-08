@@ -3,7 +3,9 @@
     public class Trip
     {
         public Guid TripId { get; set; }
-        //  public Guid DriverId { get; set; } // comes from User Service
+          public Guid DriverId { get; set; } // comes from User Service
+
+        public string DriverName { get; set; }
 
         public string StartLocation { get; set; }
         public string EndLocation { get; set; }
