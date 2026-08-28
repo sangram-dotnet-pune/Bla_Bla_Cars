@@ -1,0 +1,76 @@
+services:
+  user-service:
+    build:
+      context: .
+      dockerfile: UserService/Dockerfile
+    container_name: user-service
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_URLS: http://+:5000
+      SUPABASE_CONNECTION_STRING: ${SUPABASE_CONNECTION_STRING:?Set SUPABASE_CONNECTION_STRING in .env}
+    networks:
+      - backend
+
+  booking-service:
+    build:
+      context: .
+      dockerfile: BookingService/Dockerfile
+    container_name: booking-service
+    ports:
+      - "5001:5001"
+    environment:
+      ASPNETCORE_URLS: http://+:5001
+      SUPABASE_CONNECTION_STRING: ${SUPABASE_CONNECTION_STRING:?Set SUPABASE_CONNECTION_STRING in .env}
+      ServiceUrls__GatewayService: http://api-gateway:5003
+    networks:
+      - backend
+
+  trip-service:
+    build:
+      context: .
+      dockerfile: TripService/Dockerfile
+    container_name: trip-service
+    ports:
+      - "5002:5002"
+    environment:
+      ASPNETCORE_URLS: http://+:5002
+      SUPABASE_CONNECTION_STRING: ${SUPABASE_CONNECTION_STRING:?Set SUPABASE_CONNECTION_STRING in .env}
+      ServiceUrls__GatewayService: http://api-gateway:5003
+    networks:
+      - backend
+
+  chat-service:
+    build:
+      context: .
+      dockerfile: ChatService/Dockerfile
+    container_name: chat-service
+    ports:
+      - "5006:5006"
+    environment:
+      ASPNETCORE_URLS: http://+:5006
+      SUPABASE_CONNECTION_STRING: ${SUPABASE_CONNECTION_STRING:?Set SUPABASE_CONNECTION_STRING in .env}
+    networks:
+      - backend
+
+  gateway:
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    container_name: api-gateway
+    ports:
+      - "5003:5003"
+    environment:
+      ASPNETCORE_URLS: http://+:5003
+      OCELOT_CONFIG_FILE: ocelot.Docker.json
+    depends_on:
+      - user-service
+      - booking-service
+      - trip-service
+      - chat-service
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

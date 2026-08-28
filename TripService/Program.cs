@@ -36,7 +36,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddHttpClient<UserClientService>(client =>
 {
-    client.BaseAddress = new Uri("http://localhost:5003/");
+    client.BaseAddress = GetRequiredServiceUrl(builder.Configuration, "GatewayService");
 });
 builder.Services.AddDbContext<TripDbContext>(options =>
 {
@@ -79,3 +79,15 @@ static string GetDatabaseConnectionString(IConfiguration configuration) =>
     ?? configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException(
         "Set SUPABASE_CONNECTION_STRING to your Supabase PostgreSQL connection string.");
+
+static Uri GetRequiredServiceUrl(IConfiguration configuration, string serviceName)
+{
+    var value = configuration[$"ServiceUrls:{serviceName}"];
+    if (string.IsNullOrWhiteSpace(value))
+    {
+        throw new InvalidOperationException(
+            $"ServiceUrls:{serviceName} is not configured.");
+    }
+
+    return new Uri(value, UriKind.Absolute);
+}

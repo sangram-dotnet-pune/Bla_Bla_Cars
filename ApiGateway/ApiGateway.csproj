@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+    <None Update="ocelot*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

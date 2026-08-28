@@ -10,8 +10,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddOcelot(); // Register Ocelot services
-builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true); // Load Ocelot configuration
+var ocelotConfigFile = builder.Configuration["OCELOT_CONFIG_FILE"] ?? "ocelot.json";
+builder.Configuration.AddJsonFile(ocelotConfigFile, optional: false, reloadOnChange: true);
+builder.Services.AddOcelot();
 
 builder.Services.AddCors(options =>
 {

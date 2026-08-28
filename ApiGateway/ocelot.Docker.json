@@ -1,0 +1,407 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/reviews",
+      "UpstreamPathTemplate": "/api/reviews",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/reviews/ride/{rideId}",
+      "UpstreamPathTemplate": "/api/reviews/ride/{rideId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/users/{userId}/reviews",
+      "UpstreamPathTemplate": "/api/users/{userId}/reviews",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/reviews",
+      "UpstreamPathTemplate": "/reviews",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/reviews/ride/{rideId}",
+      "UpstreamPathTemplate": "/reviews/ride/{rideId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/users/{userId}/reviews",
+      "UpstreamPathTemplate": "/users/{userId}/reviews",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/trip",
+      "UpstreamPathTemplate": "/api/trip",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "trip-service",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/trip/my-trips",
+      "UpstreamPathTemplate": "/api/trip/my-trips",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "trip-service",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Trip/{tripId}",
+      "UpstreamPathTemplate": "/api/Trip/{tripId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "trip-service",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/trip/update-seats/{tripId}/{seats}",
+      "UpstreamPathTemplate": "/api/trip/update-seats/{tripId}/{seats}",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "trip-service",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/trip/restore-seats/{tripId}/{seats}",
+      "UpstreamPathTemplate": "/api/trip/restore-seats/{tripId}/{seats}",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "trip-service",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/trip/{tripId}/status",
+      "UpstreamPathTemplate": "/api/trip/{tripId}/status",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "trip-service",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking",
+      "UpstreamPathTemplate": "/booking",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "booking-service",
+          "Port": 5001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/trip/{tripId}",
+      "UpstreamPathTemplate": "/booking/trip/{tripId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "booking-service",
+          "Port": 5001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking",
+      "UpstreamPathTemplate": "/booking",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "booking-service",
+          "Port": 5001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/cancel/{bookingId}",
+      "UpstreamPathTemplate": "/booking/cancel/{bookingId}",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "booking-service",
+          "Port": 5001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/{bookingId}/approve",
+      "UpstreamPathTemplate": "/booking/{bookingId}/approve",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "booking-service",
+          "Port": 5001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/booking/{bookingId}/reject",
+      "UpstreamPathTemplate": "/booking/{bookingId}/reject",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "booking-service",
+          "Port": 5001
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/register",
+      "UpstreamPathTemplate": "/auth/register",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/login",
+      "UpstreamPathTemplate": "/auth/login",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth",
+      "UpstreamPathTemplate": "/auth",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/update-profile",
+      "UpstreamPathTemplate": "/auth/update-profile",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/profile/about",
+      "UpstreamPathTemplate": "/auth/profile/about",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/profile/vehicle",
+      "UpstreamPathTemplate": "/auth/profile/vehicle",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/change-password",
+      "UpstreamPathTemplate": "/auth/change-password",
+      "UpstreamHttpMethod": [
+        "PUT"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/me/{userId}",
+      "UpstreamPathTemplate": "/auth/me/{userId}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service",
+          "Port": 5000
+        }
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/chat/{everything}",
+      "UpstreamPathTemplate": "/chat/{everything}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "OPTIONS"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "chat-service",
+          "Port": 5006
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/hubs/chat/{everything}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "OPTIONS"
+      ],
+      "DownstreamPathTemplate": "/chatHub/{everything}",
+      "DownstreamScheme": "ws",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "chat-service",
+          "Port": 5006
+        }
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5003"
+  }
+}

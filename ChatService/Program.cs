@@ -43,7 +43,6 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowGatewayAndFrontend", policy =>
     {
         policy.WithOrigins(
-                "https://localhost:5001", // gateway
                 "http://localhost:5173",
                 "https://localhost:5173")
               .AllowAnyHeader()
