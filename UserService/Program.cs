@@ -3,13 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UserService.Models;
+using UserService.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // DB
 builder.Services.AddDbContext<AppUserDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(GetDatabaseConnectionString(builder.Configuration)));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -55,6 +56,16 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
 });
+builder.Services.AddHttpClient<TripReviewClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:Trip"] ?? "http://localhost:5002/");
+});
+builder.Services.AddHttpClient<BookingReviewClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:Booking"] ?? "http://localhost:5001/");
+});
+builder.Services.AddScoped<ReviewService>();
+builder.Services.AddAuthorization();
 
 
 
@@ -72,3 +83,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.Run();
+
+static string GetDatabaseConnectionString(IConfiguration configuration) =>
+    configuration["SUPABASE_CONNECTION_STRING"]
+    ?? configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "Set SUPABASE_CONNECTION_STRING to your Supabase PostgreSQL connection string.");

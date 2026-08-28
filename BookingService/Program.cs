@@ -64,7 +64,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddDbContext<BookingDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(GetDatabaseConnectionString(builder.Configuration));
 });
 var app = builder.Build();
 
@@ -75,8 +75,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();
+
+static string GetDatabaseConnectionString(IConfiguration configuration) =>
+    configuration["SUPABASE_CONNECTION_STRING"]
+    ?? configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "Set SUPABASE_CONNECTION_STRING to your Supabase PostgreSQL connection string.");

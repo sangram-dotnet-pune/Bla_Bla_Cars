@@ -55,10 +55,21 @@ namespace BookingService.Controllers
                 .ToListAsync();
 
             var response = new List<BookingResponse>();
+            var completedBookings = new List<Booking>();
 
             foreach (var booking in bookings)
             {
                 var trip = await _tripClient.GetTripByIdAsync(booking.TripId);
+                if (trip is null)
+                    continue;
+
+                if (trip.Status == TripStatus.Completed &&
+                    booking.Status != BookingStatus.Cancelled)
+                {
+                    booking.Status = BookingStatus.Cancelled;
+                    booking.CancelledAt ??= DateTime.UtcNow;
+                    completedBookings.Add(booking);
+                }
 
                 response.Add(new BookingResponse
                 {
@@ -68,9 +79,14 @@ namespace BookingService.Controllers
                     PassengerName = booking.PassengerName,
                     SeatsBooked = booking.SeatsBooked,
                     Status = booking.Status.ToString(),
-                    TotalAmount = booking.TotalAmount
+                    TotalAmount = booking.TotalAmount,
+                    CreatedAt = booking.CreatedAt,
+                    CancelledAt = booking.CancelledAt
                 });
             }
+
+            if (completedBookings.Count > 0)
+                await _context.SaveChangesAsync();
 
             return Ok(response);
         }
@@ -112,6 +128,14 @@ namespace BookingService.Controllers
         [Authorize]
         public async Task<ActionResult> CreateBooking([FromBody] CreateBookingRequest booking)
         {
+            var passengerIdValue =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                User.FindFirst("sub")?.Value ??
+                User.FindFirst("userId")?.Value;
+
+            if (!Guid.TryParse(passengerIdValue, out var passengerId))
+                return Unauthorized("Passenger ID claim missing or invalid.");
+
             var trip = await _tripClient.GetTripByIdAsync(booking.TripId);
             if (trip == null)
                 return NotFound("Trip does not exist!");
@@ -129,7 +153,7 @@ namespace BookingService.Controllers
             Booking newBooking = new Booking()
             {
                 TripId = booking.TripId,
-                PassengerId = booking.PassengerId,
+                PassengerId = passengerId,
                 SeatsBooked = booking.SeatsBooked,
                 PassengerName = booking.PassengerName,
                 DriverId=trip.DriverId,
@@ -144,7 +168,7 @@ namespace BookingService.Controllers
             await _context.Bookings.AddAsync(newBooking);
             await _context.SaveChangesAsync();
 
-            return Ok(booking);
+            return Ok(newBooking);
         }
 
         //passanger feature to cancel booking 
@@ -251,6 +275,96 @@ namespace BookingService.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { bookingId = booking.BookingId, status = booking.Status.ToString(), message = "Booking rejected and seats restored." });
+        }
+
+        [HttpGet("review-validation/{bookingId:guid}")]
+        [Authorize]
+        public async Task<IActionResult> GetReviewValidation(Guid bookingId)
+        {
+            var requesterId = GetUserId();
+            if (requesterId is null)
+                return Unauthorized("User id claim missing or invalid.");
+
+            var booking = await _context.Bookings.AsNoTracking()
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+            if (booking is null)
+                return NotFound("Booking not found.");
+            if (booking.PassengerId != requesterId && booking.DriverId != requesterId)
+                return Forbid();
+
+            Trip? trip;
+            try
+            {
+                trip = await _tripClient.GetTripByIdAsync(booking.TripId);
+            }
+            catch (HttpRequestException)
+            {
+                return StatusCode(502, "Trip service validation failed.");
+            }
+            if (trip is null)
+                return NotFound("Ride not found.");
+
+            return Ok(new
+            {
+                bookingId = booking.BookingId,
+                tripId = booking.TripId,
+                passengerId = booking.PassengerId,
+                driverId = booking.DriverId,
+                status = booking.Status.ToString(),
+                tripStatus = trip.Status.ToString()
+            });
+        }
+
+        [HttpGet("review-participants/{tripId:guid}")]
+        [Authorize]
+        public async Task<IActionResult> GetReviewParticipants(Guid tripId)
+        {
+            var requesterId = GetUserId();
+            if (requesterId is null)
+                return Unauthorized("User id claim missing or invalid.");
+
+            Trip? trip;
+            try
+            {
+                trip = await _tripClient.GetTripByIdAsync(tripId);
+            }
+            catch (HttpRequestException)
+            {
+                return StatusCode(502, "Trip service validation failed.");
+            }
+            if (trip is null)
+                return NotFound("Ride not found.");
+
+            var bookings = await _context.Bookings.AsNoTracking()
+                .Where(b => b.TripId == tripId && b.Status == BookingStatus.Confirmed)
+                .ToListAsync();
+            var participants = bookings.Select(b => new
+                {
+                    bookingId = b.BookingId,
+                    passengerId = b.PassengerId,
+                    driverId = b.DriverId,
+                    passengerName = b.PassengerName,
+                    status = b.Status.ToString()
+                }).ToList();
+
+            if (trip.DriverId != requesterId && !bookings.Any(b => b.PassengerId == requesterId))
+                return Forbid();
+
+            return Ok(new
+            {
+                tripId,
+                driverId = trip.DriverId,
+                tripStatus = trip.Status.ToString(),
+                bookings = participants
+            });
+        }
+
+        private Guid? GetUserId()
+        {
+            var value = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst("sub")?.Value
+                ?? User.FindFirst("userId")?.Value;
+            return Guid.TryParse(value, out var userId) ? userId : null;
         }
 
 

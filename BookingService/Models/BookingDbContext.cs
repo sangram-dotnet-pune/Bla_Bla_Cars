@@ -20,7 +20,7 @@ namespace BookingService.Models
                       .HasConversion<string>();  
 
                 entity.Property(b => b.CreatedAt)
-                      .HasDefaultValueSql("GETUTCDATE()");
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
         }
     }

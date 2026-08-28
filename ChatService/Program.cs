@@ -34,7 +34,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 builder.Services.AddDbContext<ChatDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(GetDatabaseConnectionString(builder.Configuration));
 });
 
 
@@ -71,5 +71,10 @@ app.UseAuthorization();
 app.MapHub<ChatHub>("/chatHub");
 
 app.MapControllers();
-
 app.Run();
+
+static string GetDatabaseConnectionString(IConfiguration configuration) =>
+    configuration["SUPABASE_CONNECTION_STRING"]
+    ?? configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "Set SUPABASE_CONNECTION_STRING to your Supabase PostgreSQL connection string.");

@@ -24,7 +24,7 @@ namespace ChatService.Models
 
            
             modelBuilder.Entity<Conversation>()
-                .HasIndex(c => c.BookingId)
+                .HasIndex(c => new { c.PassengerId, c.DriverId })
                 .IsUnique();
         }
     }
