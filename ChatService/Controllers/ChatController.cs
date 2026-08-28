@@ -20,8 +20,16 @@ namespace ChatService.Controllers
         [HttpPost("conversation")]
         public async Task<IActionResult> CreateConversation(CreateConversationDto dto)
         {
+            if (dto.PassengerId == Guid.Empty || dto.DriverId == Guid.Empty)
+                return BadRequest("PassengerId and DriverId are required.");
+
+            if (dto.PassengerId == dto.DriverId)
+                return BadRequest("PassengerId and DriverId must be different.");
+
             var existing = await _context.Conversations
-                .FirstOrDefaultAsync(c => c.BookingId == dto.BookingId);
+                .FirstOrDefaultAsync(c =>
+                    c.PassengerId == dto.PassengerId &&
+                    c.DriverId == dto.DriverId);
 
             if (existing != null)
                 return Ok(existing);
@@ -35,7 +43,23 @@ namespace ChatService.Controllers
             };
 
             _context.Conversations.Add(conversation);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                var concurrentConversation = await _context.Conversations
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c =>
+                        c.PassengerId == dto.PassengerId &&
+                        c.DriverId == dto.DriverId);
+
+                if (concurrentConversation is null)
+                    throw;
+
+                return Ok(concurrentConversation);
+            }
 
             return Ok(conversation);
         }
@@ -73,4 +97,3 @@ namespace ChatService.Controllers
     }
 
 }
-

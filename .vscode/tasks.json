@@ -1,0 +1,128 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Restore .NET solution",
+      "type": "shell",
+      "command": "dotnet restore Bla_Bla_Cars.sln",
+      "inAgents": true,
+      "runOptions": {
+        "runOn": "worktreeCreated"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Build .NET solution",
+      "type": "shell",
+      "command": "dotnet build Bla_Bla_Cars.sln",
+      "inAgents": true,
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Apply Supabase migrations",
+      "dependsOn": [
+        "Apply UserService migration",
+        "Apply BookingService migration",
+        "Apply TripService migration",
+        "Apply ChatService migration"
+      ],
+      "dependsOrder": "parallel",
+      "inAgents": true
+    },
+    {
+      "label": "Apply UserService migration",
+      "type": "shell",
+      "command": "dotnet ef database update --project UserService/UserService.csproj",
+      "inAgents": true,
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Apply BookingService migration",
+      "type": "shell",
+      "command": "dotnet ef database update --project BookingService/BookingService.csproj",
+      "inAgents": true,
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Apply TripService migration",
+      "type": "shell",
+      "command": "dotnet ef database update --project TripService/TripService.csproj",
+      "inAgents": true,
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Apply ChatService migration",
+      "type": "shell",
+      "command": "dotnet ef database update --project ChatService/ChatService.csproj",
+      "inAgents": true,
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Run API Gateway",
+      "type": "shell",
+      "command": "dotnet run --project ApiGateway/ApiGateway.csproj --launch-profile http",
+      "inAgents": true,
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "Run Booking Service",
+      "type": "shell",
+      "command": "dotnet run --project BookingService/BookingService.csproj --launch-profile http",
+      "inAgents": true,
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "Run Trip Service",
+      "type": "shell",
+      "command": "dotnet run --project TripService/TripService.csproj --launch-profile http",
+      "inAgents": true,
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "Run User Service",
+      "type": "shell",
+      "command": "dotnet run --project UserService/UserService.csproj --launch-profile http",
+      "inAgents": true,
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "Run Chat Service",
+      "type": "shell",
+      "command": "dotnet run --project ChatService/ChatService.csproj --launch-profile http",
+      "inAgents": true,
+      "problemMatcher": "$msCompile",
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "Run All Services",
+      "dependsOn": [
+        "Run API Gateway",
+        "Run Booking Service",
+        "Run Trip Service",
+        "Run User Service",
+        "Run Chat Service"
+      ],
+      "dependsOrder": "parallel",
+      "inAgents": true
+    }
+  ]
+}

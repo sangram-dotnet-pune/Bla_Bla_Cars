@@ -40,7 +40,7 @@ builder.Services.AddHttpClient<UserClientService>(client =>
 });
 builder.Services.AddDbContext<TripDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(GetDatabaseConnectionString(builder.Configuration));
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -72,5 +72,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();
+
+static string GetDatabaseConnectionString(IConfiguration configuration) =>
+    configuration["SUPABASE_CONNECTION_STRING"]
+    ?? configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "Set SUPABASE_CONNECTION_STRING to your Supabase PostgreSQL connection string.");

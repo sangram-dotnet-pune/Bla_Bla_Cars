@@ -11,7 +11,7 @@ namespace TripService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+
     public class TripController : ControllerBase
     {
 
@@ -25,6 +25,7 @@ namespace TripService.Controllers
         }
 
         [HttpGet("my-trips")]
+            [Authorize]
         public async Task<ActionResult<List<TripResponseDto>>> getAllTripsUser()
         {
 
@@ -55,6 +56,9 @@ namespace TripService.Controllers
                 TripId = t.TripId,
                 DriverId = t.DriverId,
                 DriverName = user.FullName,  // 👈 from client service
+                DriverMiniBio = user.MiniBio,
+                DriverTravelPreferences = user.TravelPreferences,
+                DriverVehicle = ToDriverVehicle(user.Vehicle),
 
                 StartLocation = t.StartLocation,
                 EndLocation = t.EndLocation,
@@ -81,6 +85,7 @@ namespace TripService.Controllers
           
             var trips = await _context.Trips
                 .AsNoTracking()
+                .Where(t => t.Status != TripStatus.Completed)
                 .ToListAsync();
 
             if (trips == null || trips.Count == 0)
@@ -122,6 +127,9 @@ namespace TripService.Controllers
                     TripId = t.TripId,
                     DriverId = t.DriverId,
                     DriverName = user?.FullName ?? string.Empty,
+                    DriverMiniBio = user?.MiniBio,
+                    DriverTravelPreferences = user?.TravelPreferences,
+                    DriverVehicle = ToDriverVehicle(user?.Vehicle),
 
                     StartLocation = t.StartLocation,
                     EndLocation = t.EndLocation,
@@ -140,6 +148,7 @@ namespace TripService.Controllers
         }
 
         [HttpGet("{tripId:guid}")]
+
         public async Task<ActionResult<TripResponseDto>> GetTripById(Guid tripId)
         {
             var trip = await _context.Trips
@@ -161,6 +170,9 @@ namespace TripService.Controllers
                 TripId = trip.TripId,
                 DriverId = trip.DriverId,
                 DriverName = user.FullName, 
+                DriverMiniBio = user.MiniBio,
+                DriverTravelPreferences = user.TravelPreferences,
+                DriverVehicle = ToDriverVehicle(user.Vehicle),
 
                 StartLocation = trip.StartLocation,
                 EndLocation = trip.EndLocation,
@@ -177,9 +189,56 @@ namespace TripService.Controllers
             return Ok(tripDto);
         }
 
+        // Read-only endpoint used by User Service to validate review eligibility.
+        [HttpGet("review-validation/{tripId:guid}")]
+        [Authorize]
+        public async Task<IActionResult> GetReviewValidation(Guid tripId)
+        {
+            var trip = await _context.Trips.AsNoTracking()
+                .FirstOrDefaultAsync(t => t.TripId == tripId);
+            return trip is null
+                ? NotFound("Ride not found.")
+                : Ok(new { tripId = trip.TripId, driverId = trip.DriverId, status = trip.Status.ToString() });
+        }
+
+        public sealed class UpdateTripStatusRequest
+        {
+            public TripStatus Status { get; set; }
+        }
+
+        [HttpPut("{tripId:guid}/status")]
+        [Authorize]
+        public async Task<IActionResult> UpdateStatus(
+            Guid tripId,
+            [FromBody] UpdateTripStatusRequest request)
+        {
+            var userIdValue = User.FindFirst("userId")?.Value
+                ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst("sub")?.Value;
+
+            if (!Guid.TryParse(userIdValue, out var userId))
+                return Unauthorized("User ID claim missing or invalid.");
+
+            var trip = await _context.Trips.FirstOrDefaultAsync(t => t.TripId == tripId);
+            if (trip is null)
+                return NotFound("Trip not found.");
+
+            if (trip.DriverId != userId)
+                return Forbid();
+
+            if (!Enum.IsDefined(request.Status))
+                return BadRequest("Invalid trip status.");
+
+            trip.Status = request.Status;
+            await _context.SaveChangesAsync();
+
+            return Ok(trip);
+        }
+
 
 
         [HttpPost]
+            [Authorize]
         public async Task<ActionResult<Trip>> CreateTrip([FromBody] Trip trip)
         {
             if (trip == null || !ModelState.IsValid)
@@ -192,13 +251,38 @@ namespace TripService.Controllers
                 return Unauthorized("User ID not found in token");
 
             trip.DriverId = Guid.Parse(userIdClaim.Value);
+            trip.DepartureTime = NormalizeToUtc(trip.DepartureTime);
+            trip.ArrivalTime = NormalizeToUtc(trip.ArrivalTime);
 
             _context.Trips.Add(trip);
             await _context.SaveChangesAsync();
 
             return Ok(trip);
         }
+
+        private static DateTime NormalizeToUtc(DateTime value)
+        {
+            return value.Kind switch
+            {
+                DateTimeKind.Utc => value,
+                DateTimeKind.Local => value.ToUniversalTime(),
+                _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
+            };
+        }
+
+        private static DriverVehicleDto? ToDriverVehicle(UserClientService.VehicleDto? vehicle)
+        {
+            return vehicle is null ? null : new DriverVehicleDto
+            {
+                Make = vehicle.Make,
+                Model = vehicle.Model,
+                Year = vehicle.Year,
+                Color = vehicle.Color
+            };
+        }
+
         [HttpPut("update-seats/{tripId:guid}/{seats:int}")]
+            [Authorize]
         public async Task<ActionResult> UpdateAvailableSeats(Guid tripId, int seats)
         {
             var trip = await _context.Trips.FirstOrDefaultAsync(x => x.TripId == tripId);
@@ -217,7 +301,7 @@ namespace TripService.Controllers
 
 
         [HttpPut("restore-seats/{tripId:guid}/{seats:int}")]
-
+            [Authorize]
 
         public async Task<ActionResult<Trip>> RestoreSeats([FromRoute] Guid tripId, int seats)
         {

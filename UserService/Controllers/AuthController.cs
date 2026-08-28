@@ -64,7 +64,10 @@ namespace UserService.Controllers
                 userId = user.UserId,
                 fullName = user.FullName,
                 email = user.Email,
-                phoneNumber = user.PhoneNumber
+                phoneNumber = user.PhoneNumber,
+                miniBio = user.MiniBio,
+                travelPreferences = user.TravelPreferences,
+                vehicle = ToVehicle(user)
             });
         }
 
@@ -90,10 +93,24 @@ namespace UserService.Controllers
 
         public class UpdateProfileDto
         {
-            public Guid UserId { get; set; }
             public string? FullName { get; set; }
             public string? PhoneNumber { get; set; }
             public string? Email { get; set; }
+        }
+
+        public class UpdateAboutDto
+        {
+            public string? MiniBio { get; set; }
+            public string? TravelPreferences { get; set; }
+        }
+
+        public class VehicleDto
+        {
+            public string? Make { get; set; }
+            public string? Model { get; set; }
+            public int? Year { get; set; }
+            public string? Color { get; set; }
+            public string? LicensePlate { get; set; }
         }
 
         [Authorize]
@@ -101,8 +118,12 @@ namespace UserService.Controllers
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto req)
         {
             
-            var user = await _context.AppUsers
-                .FirstOrDefaultAsync(x => x.UserId == req.UserId);
+            var userIdValue = User.FindFirst("userId")?.Value
+                ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!Guid.TryParse(userIdValue, out var userId))
+                return Unauthorized("User ID claim missing or invalid.");
+
+            var user = await _context.AppUsers.FirstOrDefaultAsync(x => x.UserId == userId);
 
             if (user == null)
                 return NotFound("User not found");
@@ -115,7 +136,11 @@ namespace UserService.Controllers
                 user.PhoneNumber = req.PhoneNumber;
 
             if (!string.IsNullOrWhiteSpace(req.Email))
+            {
+                if (await _context.AppUsers.AnyAsync(x => x.Email == req.Email && x.UserId != user.UserId))
+                    return BadRequest("Email already exists");
                 user.Email = req.Email;
+            }
 
             await _context.SaveChangesAsync();
 
@@ -127,8 +152,53 @@ namespace UserService.Controllers
                     user.UserId,
                     user.FullName,
                     user.Email,
-                    user.PhoneNumber
+                    user.PhoneNumber,
+                    user.MiniBio,
+                    user.TravelPreferences,
+                    vehicle = ToVehicle(user)
                 }
+            });
+        }
+
+        [Authorize]
+        [HttpPut("profile/about")]
+        public async Task<IActionResult> UpdateAbout([FromBody] UpdateAboutDto req)
+        {
+            var user = await GetAuthenticatedUserAsync();
+            if (user is null)
+                return Unauthorized("User ID claim missing or invalid.");
+
+            user.MiniBio = req.MiniBio;
+            user.TravelPreferences = req.TravelPreferences;
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "About section updated successfully",
+                miniBio = user.MiniBio,
+                travelPreferences = user.TravelPreferences
+            });
+        }
+
+        [Authorize]
+        [HttpPut("profile/vehicle")]
+        public async Task<IActionResult> UpdateVehicle([FromBody] VehicleDto req)
+        {
+            var user = await GetAuthenticatedUserAsync();
+            if (user is null)
+                return Unauthorized("User ID claim missing or invalid.");
+
+            user.VehicleMake = req.Make;
+            user.VehicleModel = req.Model;
+            user.VehicleYear = req.Year;
+            user.VehicleColor = req.Color;
+            user.VehicleLicensePlate = req.LicensePlate;
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Vehicle section updated successfully",
+                vehicle = ToVehicle(user)
             });
         }
 
@@ -168,6 +238,9 @@ namespace UserService.Controllers
             public string FullName { get; set; }
             public string Email { get; set; }
             public string? PhoneNumber { get; set; }
+            public string? MiniBio { get; set; }
+            public string? TravelPreferences { get; set; }
+            public VehicleDto? Vehicle { get; set; }
         }
 
         [Authorize]
@@ -185,10 +258,32 @@ namespace UserService.Controllers
                 UserId = user.UserId,
                 FullName = user.FullName,
                 Email = user.Email,
-                PhoneNumber = user.PhoneNumber
+                PhoneNumber = user.PhoneNumber,
+                MiniBio = user.MiniBio,
+                TravelPreferences = user.TravelPreferences,
+                Vehicle = ToVehicle(user)
             };
 
             return Ok(dto);
+        }
+
+        private static VehicleDto ToVehicle(AppUser user) => new()
+        {
+            Make = user.VehicleMake,
+            Model = user.VehicleModel,
+            Year = user.VehicleYear,
+            Color = user.VehicleColor,
+            LicensePlate = user.VehicleLicensePlate
+        };
+
+        private async Task<AppUser?> GetAuthenticatedUserAsync()
+        {
+            var userIdValue = User.FindFirst("userId")?.Value
+                ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            return Guid.TryParse(userIdValue, out var userId)
+                ? await _context.AppUsers.FirstOrDefaultAsync(x => x.UserId == userId)
+                : null;
         }
 
     }
