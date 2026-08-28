@@ -58,11 +58,11 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 builder.Services.AddHttpClient<TripReviewClient>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:Trip"] ?? "http://localhost:5002/");
+    client.BaseAddress = GetRequiredServiceUrl(builder.Configuration, "TripService");
 });
 builder.Services.AddHttpClient<BookingReviewClient>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ServiceUrls:Booking"] ?? "http://localhost:5001/");
+    client.BaseAddress = GetRequiredServiceUrl(builder.Configuration, "BookingService");
 });
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddAuthorization();
@@ -89,3 +89,15 @@ static string GetDatabaseConnectionString(IConfiguration configuration) =>
     ?? configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException(
         "Set SUPABASE_CONNECTION_STRING to your Supabase PostgreSQL connection string.");
+
+static Uri GetRequiredServiceUrl(IConfiguration configuration, string serviceName)
+{
+    var value = configuration[$"ServiceUrls:{serviceName}"];
+    if (string.IsNullOrWhiteSpace(value))
+    {
+        throw new InvalidOperationException(
+            $"ServiceUrls:{serviceName} is not configured.");
+    }
+
+    return new Uri(value, UriKind.Absolute);
+}
