@@ -1,6 +1,10 @@
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
+Environment.SetEnvironmentVariable(
+    "DOTNET_hostBuilder:reloadConfigOnChange",
+    "false"
+);
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.2
